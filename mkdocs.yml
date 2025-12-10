@@ -1,0 +1,30 @@
+
+site_name: Project 2025 – PcBench
+theme:
+  name: material
+  features:
+    - navigation.expand
+    - navigation.sections
+    - navigation.instant
+    - search.highlight
+    - search.suggest
+  palette:
+    - scheme: default
+      primary: blue
+      accent: indigo
+
+plugins:
+  - search
+
+nav:
+  - Home: index.md
+  - Architecture:
+      - Overview: docs/architecture.md
+  - Agent: docs/agent.md
+  - Backend: docs/backend.md
+  - Frontend: docs/frontend.md
+  - ML: docs/ml.md
+  - Infrastructure: docs/infrastructure.md
+  - SLA & Risks: docs/sla_risks.md
+  - Notes:
+      - Summary 2025: notes/2025-summary.md
