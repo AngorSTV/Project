@@ -1,6 +1,6 @@
 # Infrastructure
 
-Документ описывает общую архитектуру инфраструктуры проекта **Project 2025 (PcBench)**, включая облачную среду, CI/CD пайплайны, кластеры Kubernetes, работу трёх контуров (stage / beta / prod), систему логирования, мониторинга и стратегии выката.
+Документ описывает общую архитектуру инфраструктуры проекта **Project 2025 (PcBench)**, включая облачную среду, CI/CD пайплайны, кластеры Kubernetes, работу четырёх контуров (dev / stage / beta / prod), систему логирования, мониторинга и стратегии выката.
 
 ---
 
@@ -8,12 +8,10 @@
 
 Сервис развёрнут в **Timeweb Cloud** и использует следующие компоненты:
 
-- Managed Kubernetes Cluster
+- Managed Kubernetes Cluster для каждого контура
 - Timeweb Container Registry
-- Object Storage (S3-совместимый)
-- Managed PostgreSQL
-- Managed Redis
-- Балансировщики L7 (Ingress)
+- Managed PostgreSQL для каждого контура
+- Балансировщики L7 (Ingress) для каждого контура
 - Отдельные KubeConfig для каждого контура
 
 ---
@@ -21,16 +19,25 @@
 # 2. Логическая схема инфраструктуры
 
 ```text
-Timeweb Cloud
-└── Managed Kubernetes Cluster
-    ├── Namespace p25-stage
-    ├── Namespace p25-beta
-    └── Namespace p25-prod
+Timeweb Cloud projects
+├── Beta PcBench
+|   ├── Managed Kubernetes Cluster
+|   ├── PostgreSQL
+|   ├── StageNet
+|   └── Балансировщик
+|
+├── Stage PcBench
+|   ├── Managed Kubernetes Cluster
+|   ├── PostgreSQL
+|   ├── StageNet
+|   └── Балансировщик
+|
+├── Prod PcBench    
+|   ├── Managed Kubernetes Cluster
+|   ├── PostgreSQL
+|   ├── StageNet
+|   └── Балансировщик
 
-Timeweb Container Registry
-S3 Storage (stage / beta / prod)
-PostgreSQL DB (отдельные кластеры)
-Redis (отдельные кластеры)
 ```
 
 ---
@@ -47,17 +54,14 @@ Redis (отдельные кластеры)
 - Самые свежие изменения
 - Возможны нестабильные состояния
 - Отдельная база PostgreSQL
-- Отдельный S3 бакет
 - 100% доступно только разработчикам
 
 ### Stage архитектура
 
 ```text
-Namespace: p25-stage
-- backend (3 replicas)
-- ml-service (1 replica)
+- backend (1 replicas)
 - frontend (SPA + nginx)
-- redis (single)
+- keycloak
 - postgresql (single instance)
 ```
 
@@ -75,13 +79,11 @@ Namespace: p25-stage
 ### Beta архитектура
 
 ```text
-Namespace: p25-beta
-- backend (3 replicas)
-- ml-service (2 replicas)
+- backend (1 replicas)
 - frontend beta
-- redis beta
+- keycloak
 - postgresql beta
-- s3 bucket beta
+
 ```
 
 ---
@@ -98,10 +100,11 @@ Namespace: p25-beta
 ### Prod архитектура
 
 ```text
-Namespace: p25-prod
+Namespace: default
 - backend (5–7 replicas, HPA)
 - ml-service (autoscale)
 - frontend (prod)
+- keycloak
 - redis HA
 - postgresql HA cluster
 - s3 bucket prod
@@ -174,12 +177,6 @@ GH -> Prod: Deploy stable release (manual approve)
 ---
 
 # 6. Kubernetes
-
-## 6.1 Namespaces
-
-- `p25-stage`
-- `p25-beta`
-- `p25-prod`
 
 ## 6.2 Общие манифесты
 
