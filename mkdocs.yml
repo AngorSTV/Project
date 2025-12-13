@@ -11,10 +11,15 @@ theme:
 
 plugins:
   - search
+  - plantuml-local:
+      cache: false
 
-extra_javascript:
-  - https://cdn.jsdelivr.net/npm/mermaid@11.12.2/dist/mermaid.min.js
-  - assets/mermaid-init.js
+markdown_extensions:
+  - pymdownx.superfences:
+      custom_fences:
+        - name: plantuml
+          class: plantuml
+          format: !!python/name:pymdownx.superfences.fence_code_format
 
 nav:
   - Home: index.md

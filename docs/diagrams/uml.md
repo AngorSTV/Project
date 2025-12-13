@@ -1,100 +1,125 @@
 # UML Diagrams
 
-Эта страница содержит основные UML-диаграммы проекта в формате Mermaid.
+Диаграммы рендерятся из PlantUML локально в CI (Java + Graphviz).
 
 ## 1) System context
 
-<div class="mermaid">
-flowchart LR
-  U[User] --> FE[Frontend (Angular)]
-  FE --> BE[Backend (Spring Boot)]
-  BE --> DB[(PostgreSQL)]
-  BE --> KC[Keycloak]
-  BE --> S3[(S3 Storage)]
-  BE --> KFK[Kafka]
-  AG[PC Agent (.NET)] --> BE
-  KFK --> ML[ML Service]
-</div>
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam monochrome true
+
+actor User
+rectangle "Frontend\n(Angular)" as FE
+rectangle "Backend API\n(Spring Boot)" as BE
+database "PostgreSQL" as DB
+node "Keycloak" as KC
+queue "Kafka" as KFK
+cloud "ML Service\n(Python)" as ML
+storage "S3 Storage" as S3
+component "PC Agent\n(.NET)" as AG
+
+User --> FE
+FE --> BE
+AG --> BE : Upload metrics ZIP
+BE --> DB
+BE --> KC
+BE --> S3
+BE --> KFK
+KFK --> ML
+ML --> BE : predictions
+@enduml
+```
 
 ## 2) Component diagram (high level)
 
-<div class="mermaid">
-flowchart TB
-  subgraph FE[Frontend]
-    UI[UI]
-    APIc[API Client]
-  end
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam monochrome true
 
-  subgraph BE[Backend]
-    REST[REST API]
-    AUTH[Auth/JWT]
-    REC[Recommendation Engine]
-    PROC[Processing]
-  end
+package "Frontend" {
+  [UI] as UI
+  [API Client] as APIC
+  UI --> APIC
+}
 
-  subgraph INF[Infrastructure]
-    KC[Keycloak]
-    DB[(PostgreSQL)]
-    KFK[Kafka]
-    S3[(S3)]
-    MON[Monitoring]
-  end
+package "Backend" {
+  [REST API] as REST
+  [Auth/JWT] as AUTH
+  [Recommendation Engine] as REC
+  [Processing] as PROC
+  REST --> AUTH
+  REST --> REC
+  REST --> PROC
+}
 
-  AG[Agent] --> REST
-  UI --> APIc --> REST
-  REST --> AUTH --> KC
-  REST --> DB
-  PROC --> KFK
-  PROC --> S3
-  KFK --> ML[ML Service]
-  ML --> REST
-  MON --- REST
-  MON --- KFK
-  MON --- DB
-</div>
+package "Infrastructure" {
+  database "PostgreSQL" as DB
+  node "Keycloak" as KC
+  queue "Kafka" as KFK
+  storage "S3" as S3
+}
+
+APIC --> REST
+AUTH --> KC
+REST --> DB
+PROC --> KFK
+PROC --> S3
+KFK --> [ML Service]
+[ML Service] --> REST
+@enduml
+```
 
 ## 3) Sequence: upload test
 
-<div class="mermaid">
-sequenceDiagram
-  autonumber
-  participant A as Agent
-  participant B as Backend
-  participant D as DB
-  participant K as Kafka
-  participant M as ML
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam monochrome true
 
-  A->>B: POST /api/upload (zip)
-  B->>D: create test record
-  B->>K: publish task
-  K->>M: consume task
-  M->>B: prediction + insights
-  B->>D: store results
-</div>
+actor Agent
+participant Backend
+database DB
+queue Kafka
+participant ML
+
+Agent -> Backend : POST /api/upload (zip)
+Backend -> DB : create test record
+Backend -> Kafka : publish task
+Kafka -> ML : consume task
+ML -> Backend : prediction + insights
+Backend -> DB : store results
+@enduml
+```
 
 ## 4) Class: AnalyzeResponse (draft)
 
-<div class="mermaid">
-classDiagram
-  class AnalyzeResponseDto {
-    +String scenario
-    +double score
-    +String summary
-    +List~Recommendation~ recommendations
-  }
+```plantuml
+@startuml
+skinparam shadowing false
+skinparam monochrome true
 
-  class Recommendation {
-    +String title
-    +String details
-    +String severity
-    +List~Action~ actions
-  }
+class AnalyzeResponseDto {
+  +String scenario
+  +double score
+  +String summary
+  +List<Recommendation> recommendations
+}
 
-  class Action {
-    +String type
-    +String payload
-  }
+class Recommendation {
+  +String title
+  +String details
+  +String severity
+  +List<Action> actions
+}
 
-  AnalyzeResponseDto "1" o-- "many" Recommendation
-  Recommendation "1" o-- "many" Action
-</div>
+class Action {
+  +String type
+  +String payload
+}
+
+AnalyzeResponseDto "1" o-- "many" Recommendation
+Recommendation "1" o-- "many" Action
+@enduml
+```
