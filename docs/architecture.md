@@ -1,17 +1,17 @@
-
 # Архитектура
 
 ## Общий обзор
 
 ```plantuml
 @startuml
+skinparam shadowing false
+skinparam monochrome true
+
 agent "PC Agent (.NET)" as AG
-control "Backend API
-Spring Boot" as BE
+control "Backend API\nSpring Boot" as BE
 database "PostgreSQL" as DB
 queue "Kafka" as K
-cloud "ML Service
-Python" as ML
+cloud "ML Service\nPython" as ML
 cloud "Frontend Angular" as FE
 storage "S3 Storage" as S3
 
@@ -25,8 +25,9 @@ BE --> S3 : store archives
 @enduml
 ```
 
-## Потоки данных
-1. Агент → Backend: загрузка zip архива с метриками
-2. Backend → Kafka: постановка задач обработки
-3. ML → Backend: предсказания FPS и рекомендации
-4. Backend → FE: отображение результатов в реальном времени
+## Пояснения
+- **AG** собирает метрики и отправляет архив теста (ZIP).
+- **BE** принимает тест, сохраняет артефакты и публикует задачу обработки.
+- **Kafka** используется как транспорт для асинхронной обработки.
+- **ML** рассчитывает предсказания/инсайты и возвращает их в Backend.
+- **FE** отображает результаты пользователю, включая live‑метрики (SSE).
