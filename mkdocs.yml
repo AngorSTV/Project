@@ -12,6 +12,10 @@ theme:
 plugins:
   - search
 
+extra_javascript:
+  - https://cdn.jsdelivr.net/npm/mermaid@11.12.2/dist/mermaid.min.js
+  - assets/mermaid-init.js
+
 nav:
   - Home: index.md
   - Status / Context: context.md
@@ -19,6 +23,9 @@ nav:
   - Decisions (ADR):
       - Overview: adr/index.md
       - ADR Template: adr/0001-template.md
+      - ADR 0002: adr/0002-monetization-v1.md
+      - ADR 0003: adr/0003-trust-ranking-policy.md
+  - Diagrams (UML): diagrams/uml.md
   - Architecture: architecture.md
   - Agent: agent.md
   - Backend: backend.md
