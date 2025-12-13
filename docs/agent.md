@@ -1,5 +1,13 @@
 
-# Agent (.NET 8, WPF)
+# Agent Windows 10/11
+
+## Стек используемых технологий
+- Язык: C# (.NET 8)
+- UI: WPF, livechartscore.skiasharpview.wpf 2.0.0-rc5.4
+- Сбор данных: LibreHardwareMonitor, WMI, DirectX
+- Обновления: Squirrel.Windows или кастомные
+- Логирование: Serilog
+
 
 ## Сбор метрик
 Использование LibreHardwareMonitor 0.9.4, сбор:

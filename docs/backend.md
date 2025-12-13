@@ -1,6 +1,12 @@
 
 # Backend (Spring Boot 3.5.5)
 
+## Стек используемых технологий
+
+- Java 21
+- Spring Boot 3.5
+- Lombok
+
 ## Модули
 - REST API
 - Auth (Keycloak + JWT)
