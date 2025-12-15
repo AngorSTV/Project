@@ -4,11 +4,11 @@
 
 ## Читать в первую очередь
 
-- **Status / Context**: `context.md`
-- **Roadmap**: `roadmap.md`
-- **Snapshot (автогенерация в CI)**: `_snapshot.md`
-- **Decisions (ADR)**: `adr/index.md`
-- **Changelog**: `changelog.md`
+- **Status / Context**: [context](../context/)
+- **Roadmap**: [roadmap](../roadmap/)
+- **Snapshot (автогенерация в CI)**: [snapshot](../_snapshot/)
+- **Decisions (ADR)**: [ADR index](../adr/)
+- **Changelog**: [changelog](../changelog/)
 
 ## Ссылки (Pages / raw)
 
@@ -24,7 +24,7 @@
 
 - Snapshot:
   - Pages: `_snapshot/`
-  - Raw: `https://raw.githubusercontent.com/AngorSTV/Project/main/docs/_snapshot.md`
+  - Raw: `docs/_snapshot.md` (в репозитории может быть placeholder; актуальная версия всегда в Pages, т.к. генерируется в CI при сборке)
 
 - ADR index:
   - Pages: `adr/`

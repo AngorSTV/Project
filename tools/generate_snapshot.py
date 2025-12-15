@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 """Generate docs/_snapshot.md for fast context sync.
 
-This script intentionally stays dependency-free.
-It concatenates selected key documents into a single Markdown page.
+Design goals:
+- No third-party dependencies.
+- Deterministic output.
+- Works regardless of current working directory.
+
+Note: This file is generated during CI build and included into the Pages artifact.
 """
 
 from __future__ import annotations
@@ -17,8 +21,13 @@ def _read(path: str) -> str:
         return f.read().strip()
 
 
+def _repo_root() -> str:
+    # tools/generate_snapshot.py -> repo root
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+
+
 def main() -> None:
-    repo_root = os.path.abspath(os.path.dirname(__file__))
+    repo_root = _repo_root()
 
     docs_root = os.path.join(repo_root, "docs")
     out_path = os.path.join(docs_root, "_snapshot.md")
@@ -39,7 +48,11 @@ def main() -> None:
 
     adr_dir = os.path.join(docs_root, "adr")
     adr_files = sorted(
-        [p for p in glob.glob(os.path.join(adr_dir, "*.md")) if not p.endswith("0001-template.md") and not p.endswith("index.md")]
+        [
+            p
+            for p in glob.glob(os.path.join(adr_dir, "*.md"))
+            if not p.endswith("0001-template.md") and not p.endswith("index.md")
+        ]
     )
 
     # Include up to last 5 ADRs by filename sort.
@@ -52,7 +65,7 @@ def main() -> None:
 
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
-    out = []
+    out: list[str] = []
     out.append("# Snapshot")
     out.append("")
     out.append(f"Generated: **{now}**")
@@ -65,7 +78,7 @@ def main() -> None:
         out.append("")
         out.append(body)
 
-    out.append("\n")
+    out.append("")
 
     os.makedirs(docs_root, exist_ok=True)
     with open(out_path, "w", encoding="utf-8") as f:
