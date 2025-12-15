@@ -2,6 +2,20 @@
 
 Диаграммы рендерятся из PlantUML локально в CI (Java + Graphviz).
 
+## PlantUML style guide
+
+Короткие правила, чтобы `mkdocs build --strict` не падал и схемы выглядели единообразно:
+
+- **Переносы строк в подписях — только через `\n` внутри кавычек.** Не используем реальные переводы строки в строковых литералах.
+  - ✅ `control "Backend API\nSpring Boot" as BE`
+  - ❌ `control "Backend API
+    Spring Boot" as BE`
+- **Экранируем кавычки** в подписях (если нужны) через `\"`.
+- Держим единый базовый стиль:
+  - `skinparam shadowing false`
+  - `skinparam monochrome true`
+- Используем стабильные алиасы (AG, BE, DB…), чтобы ссылки/диффы были читаемыми.
+
 ## 1) System context
 
 ```plantuml
