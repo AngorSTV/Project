@@ -4,11 +4,22 @@
 
 ## Читать в первую очередь
 
-- **Status / Context**: [context](../context/)
-- **Roadmap**: [roadmap](../roadmap/)
-- **Snapshot (автогенерация в CI)**: [snapshot](../_snapshot/)
-- **Decisions (ADR)**: [ADR index](../adr/)
-- **Changelog**: [changelog](../changelog/)
+- **Status / Context**: [context](../context.md)
+- **Roadmap**: [roadmap](../roadmap.md)
+- **Snapshot (автогенерация в CI)**: [snapshot](../_snapshot.md)
+- **Decisions (ADR)**: [ADR index](../adr/index.md)
+- **Changelog**: [changelog](../changelog.md)
+
+## Chat bootstrap
+
+Если ты открываешь новый чат по проекту и нужно быстро синхронизировать общий контекст:
+
+1. Открой **Snapshot** и проверь время генерации (строка `Generated:`).
+2. Пробеги глазами **Status / Context** и **Roadmap** — это оперативный “источник правды”.
+3. Если обсуждение упирается в политику/решение — смотри соответствующий **ADR**.
+4. Если непонятно “почему так стало” — смотри **Changelog** за последние даты.
+
+> Snapshot на GitHub Pages всегда актуален: он генерируется в CI перед `mkdocs build` и попадает в артефакт Pages.
 
 ## Ссылки (Pages / raw)
 
