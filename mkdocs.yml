@@ -22,7 +22,8 @@ markdown_extensions:
           format: !!python/name:pymdownx.superfences.fence_code_format
 
 nav:
-  - Home: index.md
+  - Notes Index: notes/index.md
+  - Snapshot: _snapshot.md
   - Status / Context: context.md
   - Roadmap: roadmap.md
   - Decisions (ADR):
@@ -30,6 +31,7 @@ nav:
       - ADR Template: adr/0001-template.md
       - ADR 0002: adr/0002-monetization-v1.md
       - ADR 0003: adr/0003-trust-ranking-policy.md
+  - Changelog: changelog.md
   - Diagrams (UML): diagrams/uml.md
   - Architecture: architecture.md
   - Agent: agent.md

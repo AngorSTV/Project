@@ -37,6 +37,9 @@ jobs:
       - name: Install docs dependencies
         run: pip install -r requirements-docs.txt
 
+      - name: Generate docs snapshot
+        run: python tools/generate_snapshot.py
+
       - name: Build MkDocs (strict)
         run: mkdocs build --strict
 
