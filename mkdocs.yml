@@ -38,6 +38,10 @@ nav:
   - Backend: backend.md
   - Frontend: frontend.md
   - ML: ml.md
+  - Metrics:
+      - Методики измерений: metrics/measurement_methodology.md
+  - Монетизация:
+      - Pricing & Packaging: monetization/pricing_packaging.md
   - Infrastructure: infrastructure.md
   - SLA & Risks: sla_risks.md
   - Notes:
