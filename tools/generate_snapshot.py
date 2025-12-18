@@ -16,7 +16,9 @@ from __future__ import annotations
 import glob
 import os
 import re
+import subprocess
 from datetime import datetime, timezone
+from typing import Optional, Tuple
 
 
 def _read(path: str) -> str:
@@ -52,6 +54,60 @@ def _rewrite_links(markdown: str) -> str:
     return re.sub(r"\[([^\]]+)\]\(([^)]+)\)", repl, markdown)
 
 
+def _git(repo_root: str, *args: str) -> Optional[str]:
+    """Run git command in repo_root and return stdout (stripped) or None."""
+    try:
+        return subprocess.check_output(
+            ["git", "-C", repo_root, *args],
+            text=True,
+            stderr=subprocess.DEVNULL,
+        ).strip()
+    except Exception:
+        return None
+
+
+def _infer_github_repo(repo_root: str) -> Optional[str]:
+    """Return GitHub repo slug like 'owner/name' if possible."""
+    env_repo = (os.getenv("GITHUB_REPOSITORY") or "").strip()
+    if env_repo:
+        return env_repo
+
+    # Try to infer from origin URL (works locally if remote is configured).
+    origin = _git(repo_root, "config", "--get", "remote.origin.url")
+    if not origin:
+        return None
+
+    # Examples:
+    # - https://github.com/AngorSTV/Project.git
+    # - git@github.com:AngorSTV/Project.git
+    # - https://github.com/AngorSTV/Project
+    m = re.search(r"github\.com[:/](?P<slug>[^/\s]+/[^/\s]+?)(?:\.git)?$", origin)
+    if not m:
+        return None
+
+    return m.group("slug")
+
+
+def _build_commit(repo_root: str) -> Optional[Tuple[str, str, Optional[str]]]:
+    """Return (full_sha, short_sha, commit_url) if available; otherwise None.
+
+    Preference order:
+    1) GitHub Actions env: GITHUB_SHA (+ inferred repo for URL)
+    2) Local git: `git -C <repo_root> rev-parse ...`
+    """
+    full = (os.getenv("GITHUB_SHA") or "").strip()
+    if not full:
+        full = _git(repo_root, "rev-parse", "HEAD") or ""
+
+    if not full:
+        return None
+
+    short = full[:7]
+    repo = _infer_github_repo(repo_root)
+    url = f"https://github.com/{repo}/commit/{full}" if repo else None
+    return (full, short, url)
+
+
 def main() -> None:
     repo_root = _repo_root()
 
@@ -75,11 +131,7 @@ def main() -> None:
 
     adr_dir = os.path.join(docs_root, "adr")
     adr_files = sorted(
-        [
-            p
-            for p in glob.glob(os.path.join(adr_dir, "*.md"))
-            if not p.endswith("index.md")
-        ]
+        [p for p in glob.glob(os.path.join(adr_dir, "*.md")) if not p.endswith("index.md")]
     )
 
     # Include up to last 5 ADRs by filename sort.
@@ -91,17 +143,24 @@ def main() -> None:
     add("Changelog", "docs/changelog.md")
 
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    commit = _build_commit(repo_root)
 
     out: list[str] = []
     out.append("# Snapshot")
     out.append("")
     out.append(f"Generated: **{now}**")
+    if commit:
+        _full, short, url = commit
+        if url:
+            out.append(f"Build commit: [{short}]({url})")
+        else:
+            out.append(f"Build commit: **{short}**")
     out.append("")
     out.append("Эта страница — единый агрегированный контекст проекта (для быстрой синхронизации в новых чатах).")
     out.append("")
     out.append("## Chat bootstrap")
     out.append("")
-    out.append("1. Проверь строку `Generated:` (контекст актуален, если дата свежая).")
+    out.append("1. Проверь строки `Generated:` и `Build commit:` (актуальность и привязка к коммиту).")
     out.append("2. Пробеги глазами разделы **Status / Context** и **Roadmap**.")
     out.append("3. Для решений и политики смотри соответствующие **ADR** (ссылки ниже должны открываться корректно).")
     out.append("4. Для истории изменений — **Changelog**.")
